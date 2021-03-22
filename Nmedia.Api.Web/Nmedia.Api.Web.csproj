@@ -11,4 +11,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Nmedia.Api.Application\Nmedia.Api.Application.csproj" />
+    <ProjectReference Include="..\Nmedia.Api.Infrastructure\Nmedia.Api.Infrastructure.csproj" />
+    <ProjectReference Include="..\Nmedia.Api.Persistence.Altitude3\Nmedia.Api.Persistence.Altitude3.csproj" />
+  </ItemGroup>
+
 </Project>
