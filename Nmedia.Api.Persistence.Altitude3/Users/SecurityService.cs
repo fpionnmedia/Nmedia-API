@@ -22,6 +22,29 @@ namespace Nmedia.Api.Persistence.Altitude3.Users
       _client = client ?? throw new ArgumentNullException(nameof(client));
     }
 
+    public async Task<User> AuthenticateAsync(string refreshToken, CancellationToken cancellationToken)
+    {
+      var token = Guid.Parse(refreshToken);
+
+      var requestUri = new Uri("/authenticate", UriKind.Relative);
+      using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+      request.Headers.Add("Authorization", $"Bearer {token}");
+
+      using HttpResponseMessage response = await _client.SendAsync(request, cancellationToken);
+      response.EnsureSuccessStatusCode();
+      string json = await response.Content.ReadAsStringAsync();
+      SessionState state = JsonSerializer.Deserialize<SessionState>(json)!;
+
+      return new User
+      {
+        Id = state.UserGuid,
+        Name = state.PersonName,
+        Role = GetRole(state.UserType),
+        Token = token,
+        Username = state.Username
+      };
+    }
+
     public async Task<User> LogInAsync(string username, string password, CancellationToken cancellationToken)
     {
       var requestUri = new Uri("/log-in", UriKind.Relative);

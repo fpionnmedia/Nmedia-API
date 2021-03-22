@@ -28,5 +28,14 @@ namespace Nmedia.Api.Web.Controllers
     {
       return Ok(await _mediator.Send(new LogIn(model), cancellationToken));
     }
+
+    [HttpPost("renew")]
+    public async Task<ActionResult<TokenModel>> RenewAsync(
+      [FromBody] RenewModel model,
+      CancellationToken cancellationToken
+    )
+    {
+      return Ok(await _mediator.Send(new Renew(model), cancellationToken));
+    }
   }
 }
