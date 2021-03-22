@@ -1,5 +1,7 @@
+#nullable enable
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,17 +11,23 @@ using Nmedia.Api.Infrastructure;
 using Nmedia.Api.Infrastructure.Configuration;
 using Nmedia.Api.Persistence.Altitude3;
 using Nmedia.Api.Persistence.Altitude3.Configuration;
+using Nmedia.Api.Persistence.Npgsql;
 using Nmedia.Api.Web.Configuration;
+using Nmedia.Api.Web.Filters;
+using Nmedia.Api.Web.Middlewares;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Nmedia.Api.Web
 {
   public class Startup
   {
+    private readonly IConfiguration _configuration;
+
     private readonly ApiConfiguration _apiConfiguration;
     private readonly CorsConfiguration _corsConfiguration;
-
-    private readonly IConfiguration _configuration;
+    private readonly HashSet<string> _publicRoutes;
 
     public Startup(IConfiguration configuration)
     {
@@ -31,15 +39,22 @@ namespace Nmedia.Api.Web
       _corsConfiguration = configuration
         .GetSection(CorsConfiguration.SectionName)
         .Get<CorsConfiguration>();
+
+      _publicRoutes = _apiConfiguration.PublicRoutes?.ToHashSet() ?? new HashSet<string>();
     }
 
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddAltitude3();
       services.AddApplication();
-      services.AddControllers();
+      services.AddControllers(options =>
+      {
+        options.Filters.Add(new ApiExceptionFilterAttribute());
+        options.Filters.Add(new DbUpdateExceptionFilterAttribute());
+      });
       services.AddCors();
       services.AddInfrastructure();
+      services.AddNpgsql();
       services.AddSwagger(_apiConfiguration);
 
       services.Configure<AltitudeOptions>(_configuration.GetSection(AltitudeOptions.SectionName));
@@ -62,8 +77,23 @@ namespace Nmedia.Api.Web
       application.UseHttpsRedirection();
       application.UseRouting();
       application.UseCors(policy => policy.Configure(_corsConfiguration));
+      application.UseWhen(RequiresAuth, application => application.UseMiddleware<Authentication>());
       application.UseAuthorization();
       application.UseEndpoints(endpoints => endpoints.MapControllers());
     }
+
+    private bool RequiresAuth(HttpContext context)
+    {
+      PathString path = context.Request.Path;
+
+      if (path.HasValue)
+      {
+        string trimmed = path.Value!.Trim('/');
+        return !string.IsNullOrEmpty(trimmed) && !_publicRoutes.Contains(trimmed);
+      }
+
+      return false;
+    }
+
   }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿#nullable enable
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Nmedia.Api.Application.Users;
 using Nmedia.Api.Persistence.Altitude3.Configuration;

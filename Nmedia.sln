@@ -26,6 +26,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nmedia.Api.Persistence.Alti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nmedia.Api.Infrastructure", "Nmedia.Api.Infrastructure\Nmedia.Api.Infrastructure.csproj", "{1BAA9240-02B1-48C1-8F4A-38C4D47AE03B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nmedia.Domain", "Nmedia.Domain\Nmedia.Domain.csproj", "{0396658D-3F69-4D2A-82E5-1C1CED9B5026}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nmedia.Api.Persistence.Npgsql", "Nmedia.Api.Persistence.Npgsql\Nmedia.Api.Persistence.Npgsql.csproj", "{21F5A5C4-486E-4060-B721-C186077DE856}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +52,14 @@ Global
 		{1BAA9240-02B1-48C1-8F4A-38C4D47AE03B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BAA9240-02B1-48C1-8F4A-38C4D47AE03B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BAA9240-02B1-48C1-8F4A-38C4D47AE03B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0396658D-3F69-4D2A-82E5-1C1CED9B5026}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0396658D-3F69-4D2A-82E5-1C1CED9B5026}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0396658D-3F69-4D2A-82E5-1C1CED9B5026}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0396658D-3F69-4D2A-82E5-1C1CED9B5026}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21F5A5C4-486E-4060-B721-C186077DE856}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21F5A5C4-486E-4060-B721-C186077DE856}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21F5A5C4-486E-4060-B721-C186077DE856}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21F5A5C4-486E-4060-B721-C186077DE856}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,17 +1,47 @@
-﻿using Microsoft.AspNetCore.Cors.Infrastructure;
+﻿#nullable enable
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Nmedia.Api.Web.Configuration;
 using System;
+using System.Collections.Generic;
 
 namespace Nmedia.Api.Web
 {
   public static class DependencyInjection
   {
+    private const string BearerAuthId = "Bearer Authorization";
+
     public static IServiceCollection AddSwagger(this IServiceCollection services, ApiConfiguration apiConfiguration)
     {
       return services.AddSwaggerGen(config =>
       {
+        config.AddSecurityDefinition(BearerAuthId, new OpenApiSecurityScheme
+        {
+          Description = "Enter your token in the input below.",
+          In = ParameterLocation.Header,
+          Name = "Authorization",
+          Scheme = "Bearer",
+          Type = SecuritySchemeType.Http
+        });
+        config.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+          {
+            new OpenApiSecurityScheme
+            {
+              In = ParameterLocation.Header,
+              Name = "Bearer",
+              Reference = new OpenApiReference
+              {
+                Type = ReferenceType.SecurityScheme,
+                Id = BearerAuthId
+              },
+              Scheme = "oauth2"
+            },
+            new List<string>()
+          }
+        });
+
         config.SwaggerDoc(apiConfiguration.Version, new OpenApiInfo
         {
           Contact = new OpenApiContact
