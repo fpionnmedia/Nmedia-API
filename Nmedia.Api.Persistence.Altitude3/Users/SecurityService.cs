@@ -1,8 +1,8 @@
 ﻿#nullable enable
 using Microsoft.Extensions.Options;
 using Nmedia.Api.Application.Users;
-using Nmedia.Api.Application.Users.Models;
 using Nmedia.Api.Persistence.Altitude3.Configuration;
+using Nmedia.Domain.Users;
 using System;
 using System.Net.Http;
 using System.Text.Json;
@@ -16,31 +16,46 @@ namespace Nmedia.Api.Persistence.Altitude3.Users
     private readonly AltitudeOptions _altitudeOptions;
     private readonly HttpClient _client;
 
-    public SecurityService(
-      IOptions<AltitudeOptions> altitudeOptions, HttpClient client )
+    public SecurityService(IOptions<AltitudeOptions> altitudeOptions, HttpClient client)
     {
       _altitudeOptions = altitudeOptions?.Value ?? throw new ArgumentNullException(nameof(altitudeOptions));
       _client = client ?? throw new ArgumentNullException(nameof(client));
     }
 
-    public async Task<UserModel> LogInAsync(string username, string password, CancellationToken cancellationToken)
+    public async Task<User> LogInAsync(string username, string password, CancellationToken cancellationToken)
     {
       var requestUri = new Uri("/log-in", UriKind.Relative);
       using var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
-      request.Content = new JsonContent(new { password, username });
-      request.Headers.Add("SiteGuid", _altitudeOptions.SiteGuid.ToString());
+      request.Content = new JsonContent(new
+      {
+        password,
+        siteGuid = _altitudeOptions.SiteGuid,
+        username
+      });
 
       using HttpResponseMessage response = await _client.SendAsync(request, cancellationToken);
       response.EnsureSuccessStatusCode();
       string json = await response.Content.ReadAsStringAsync();
       LogInResult result = JsonSerializer.Deserialize<LogInResult>(json)!;
 
-      return new UserModel
+      return new User
       {
         Id = result.SessionState.UserGuid,
         Name = result.SessionState.PersonName,
+        Role = GetRole(result.SessionState.UserType),
         Token = result.TokenGuid,
         Username = result.SessionState.Username
+      };
+    }
+
+    private static Role GetRole(string userTypeName)
+    {
+      UserType userType = Enum.Parse<UserType>(userTypeName);
+
+      return userType switch
+      {
+        UserType.MasterUser => Role.Master,
+        _ => Role.Standard,
       };
     }
   }

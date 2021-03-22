@@ -11,16 +11,4 @@ namespace Nmedia.Api.Persistence.Altitude3.Users
     [JsonPropertyName("tokenGuid")]
     public Guid TokenGuid { get; set; }
   }
-
-  public class SessionState
-  {
-    [JsonPropertyName("personName")]
-    public string PersonName { get; set; }
-
-    [JsonPropertyName("userGuid")]
-    public Guid UserGuid { get; set; }
-
-    [JsonPropertyName("username")]
-    public string Username { get; set; }
-  }
 }

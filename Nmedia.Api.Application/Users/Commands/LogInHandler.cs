@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using Nmedia.Api.Application.Configuration;
 using Nmedia.Api.Application.Users.Models;
+using Nmedia.Domain.Users;
 using System;
 using System.Security.Claims;
 using System.Threading;
@@ -29,7 +30,7 @@ namespace Nmedia.Api.Application.Users.Commands
 
     public async Task<TokenModel> Handle(LogIn request, CancellationToken cancellationToken)
     {
-      UserModel user = await _securityService.LogInAsync(
+      User user = await _securityService.LogInAsync(
         request.Model.Username,
         request.Model.Password,
         cancellationToken
@@ -40,6 +41,7 @@ namespace Nmedia.Api.Application.Users.Commands
         AccessToken = _tokenService.Create(new ClaimsIdentity(new[]
         {
           new Claim("name", user.Name),
+          new Claim("role", user.Role.ToString()),
           new Claim("sub", user.Id.ToString()),
           new Claim("username", user.Username)
         }), _tokenOptions.Lifetime),

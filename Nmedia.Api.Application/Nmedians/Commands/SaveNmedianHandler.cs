@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Nmedia.Api.Application.Exceptions;
 using Nmedia.Api.Application.Nmedians.Models;
 using Nmedia.Domain.Nmedians;
+using Nmedia.Domain.Users;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,18 +14,21 @@ namespace Nmedia.Api.Application.Nmedians.Commands
 {
   public class SaveNmedianHandler : IRequestHandler<SaveNmedian, NmedianModel>
   {
+    private readonly IApplicationContext _appContext;
     private readonly IDateTimeOffset _dateTimeOffset;
     private readonly INmediaContext _dbContext;
     private readonly IGuid _guid;
     private readonly IMapper _mapper;
 
     public SaveNmedianHandler(
+      IApplicationContext appContext,
       IDateTimeOffset dateTimeOffset,
       INmediaContext dbContext,
       IGuid guid,
       IMapper mapper
     )
     {
+      _appContext = appContext ?? throw new ArgumentNullException(nameof(appContext));
       _dateTimeOffset = dateTimeOffset ?? throw new ArgumentNullException(nameof(dateTimeOffset));
       _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
       _guid = guid ?? throw new ArgumentNullException(nameof(guid));
@@ -33,6 +37,11 @@ namespace Nmedia.Api.Application.Nmedians.Commands
 
     public async Task<NmedianModel> Handle(SaveNmedian request, CancellationToken cancellationToken)
     {
+      if (_appContext.User.Role != Role.Master)
+      {
+        throw new ForbiddenException();
+      }
+
       Nmedian entity;
       if (request.Id.HasValue)
       {

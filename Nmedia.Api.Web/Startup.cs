@@ -17,6 +17,7 @@ using Nmedia.Api.Web.Filters;
 using Nmedia.Api.Web.Middlewares;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 
 namespace Nmedia.Api.Web
@@ -53,6 +54,7 @@ namespace Nmedia.Api.Web
         options.Filters.Add(new DbUpdateExceptionFilterAttribute());
       });
       services.AddCors();
+      services.AddHttpContextAccessor();
       services.AddInfrastructure();
       services.AddNpgsql();
       services.AddSwagger(_apiConfiguration);
@@ -60,6 +62,10 @@ namespace Nmedia.Api.Web
       services.Configure<AltitudeOptions>(_configuration.GetSection(AltitudeOptions.SectionName));
       services.Configure<JwtOptions>(_configuration.GetSection(JwtOptions.SectionName));
       services.Configure<TokenOptions>(_configuration.GetSection(TokenOptions.SectionName));
+
+      services.AddSingleton<IApplicationContext, HttpApplicationContext>();
+
+      JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
     }
 
     public void Configure(IApplicationBuilder application, IWebHostEnvironment environment)
