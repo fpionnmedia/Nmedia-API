@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nmedia.Api.Web", "Nmedia.Api.Web\Nmedia.Api.Web.csproj", "{3AD33BF4-1C9D-48CF-B113-13EC7A82D20C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{D46C388A-4C8E-493A-9B90-DEB8764606D2}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\create.sql = Scripts\create.sql
+		Scripts\drop.sql = Scripts\drop.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6F9D5280-2F35-4854-8F0C-E89FEE78E8B4}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3AD33BF4-1C9D-48CF-B113-13EC7A82D20C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AD33BF4-1C9D-48CF-B113-13EC7A82D20C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AD33BF4-1C9D-48CF-B113-13EC7A82D20C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AD33BF4-1C9D-48CF-B113-13EC7A82D20C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D86251B-118D-4E1B-9AEC-7BF221E6C900}
+	EndGlobalSection
+EndGlobal
