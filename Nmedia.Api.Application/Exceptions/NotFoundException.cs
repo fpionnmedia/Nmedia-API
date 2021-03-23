@@ -5,8 +5,12 @@ namespace Nmedia.Api.Application.Exceptions
 {
   public class NotFoundException : ApiException
   {
-    public NotFoundException() : base(HttpStatusCode.NotFound)
+    public NotFoundException(string? field = null) : base(HttpStatusCode.NotFound)
     {
+      if (field != null)
+      {
+        Value = new { field };
+      }
     }
   }
 }

@@ -1,6 +1,8 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Nmedia.Api.Application
 {
@@ -19,12 +21,21 @@ namespace Nmedia.Api.Application
       {
         return true;
       }
+      else if (value is IEnumerable<string> names)
+      {
+        return names.All(name => IsValid(name));
+      }
       else if (value is string name)
       {
-        return Enum.TryParse(_type, name, out object result) && Enum.IsDefined(_type, result);
+        return IsValid(name);
       }
 
       return false;
+    }
+
+    private bool IsValid(string name)
+    {
+      return Enum.TryParse(_type, name, out object value) && Enum.IsDefined(_type, value);
     }
   }
 }

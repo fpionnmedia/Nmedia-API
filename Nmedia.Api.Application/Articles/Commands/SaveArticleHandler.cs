@@ -2,17 +2,19 @@
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Nmedia.Api.Application.Articles.Models;
 using Nmedia.Api.Application.Exceptions;
-using Nmedia.Api.Application.Nmedians.Models;
+using Nmedia.Domain.Articles;
 using Nmedia.Domain.Nmedians;
 using Nmedia.Domain.Users;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Nmedia.Api.Application.Nmedians.Commands
+namespace Nmedia.Api.Application.Articles.Commands
 {
-  public class SaveNmedianHandler : IRequestHandler<SaveNmedian, NmedianModel>
+  public class SaveArticleHandler : IRequestHandler<SaveArticle, ArticleModel>
   {
     private readonly IApplicationContext _appContext;
     private readonly IDateTimeOffset _dateTimeOffset;
@@ -20,7 +22,7 @@ namespace Nmedia.Api.Application.Nmedians.Commands
     private readonly IGuid _guid;
     private readonly IMapper _mapper;
 
-    public SaveNmedianHandler(
+    public SaveArticleHandler(
       IApplicationContext appContext,
       IDateTimeOffset dateTimeOffset,
       INmediaContext dbContext,
@@ -35,17 +37,25 @@ namespace Nmedia.Api.Application.Nmedians.Commands
       _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
     }
 
-    public async Task<NmedianModel> Handle(SaveNmedian request, CancellationToken cancellationToken)
+    public async Task<ArticleModel> Handle(SaveArticle request, CancellationToken cancellationToken)
     {
       if (_appContext.User.Role != Role.Master)
       {
         throw new ForbiddenException();
       }
 
-      Nmedian entity;
+      Nmedian? nmedian = null;
+      if (request.Model.NmedianId.HasValue)
+      {
+        nmedian = await _dbContext.Nmedians
+          .SingleOrDefaultAsync(x => x.Uuid == request.Model.NmedianId.Value, cancellationToken)
+          ?? throw new NotFoundException(nameof(request.Model.NmedianId));
+      }
+
+      Article entity;
       if (request.Id.HasValue)
       {
-        entity = await _dbContext.Nmedians
+        entity = await _dbContext.Articles
           .SingleOrDefaultAsync(x => x.Uuid == request.Id.Value, cancellationToken)
           ?? throw new NotFoundException();
 
@@ -53,29 +63,29 @@ namespace Nmedia.Api.Application.Nmedians.Commands
       }
       else
       {
-        entity = new Nmedian
+        entity = new Article
         {
           Created = _dateTimeOffset.Now,
           Uuid = _guid.NewGuid()
         };
 
-        _dbContext.Nmedians.Add(entity);
+        _dbContext.Articles.Add(entity);
       }
 
-      entity.Age = request.Model.Age;
-      entity.Hired = request.Model.Hired;
-      entity.HourlyRate = request.Model.HourlyRate;
-      entity.IsActive = request.Model.IsActive;
-      entity.JobTitle = request.Model.JobTitle == null
-        ? (JobTitle?)null
-        : Enum.Parse<JobTitle>(request.Model.JobTitle);
-      entity.Name = request.Model.Name?.CleanTrim() ?? throw new InvalidOperationException("The Name is required.");
+      entity.Categories = request.Model.Categories
+        ?.Select(category => Enum.Parse<Category>(category))
+        .Distinct()
+        .ToArray();
+      entity.Content = request.Model.Content.CleanTrim();
+      entity.Nmedian = nmedian;
+      entity.NmedianId = nmedian?.Id;
       entity.Picture = request.Model.Picture?.CleanTrim();
-      entity.Slug = request.Model.Slug?.CleanTrim();
+      entity.Published = request.Model.Published;
+      entity.Title = request.Model.Title?.CleanTrim() ?? throw new InvalidOperationException("The Title is required.");
 
       await _dbContext.SaveChangesAsync(cancellationToken);
 
-      return _mapper.Map<NmedianModel>(entity);
+      return _mapper.Map<ArticleModel>(entity);
     }
   }
 }

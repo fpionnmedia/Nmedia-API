@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Nmedia.Api.Application;
+using Nmedia.Domain.Articles;
 using Nmedia.Domain.Nmedians;
 
 namespace Nmedia.Api.Persistence.Npgsql
@@ -10,6 +11,7 @@ namespace Nmedia.Api.Persistence.Npgsql
     {
     }
 
+    public DbSet<Article> Articles { get; set; }
     public DbSet<Nmedian> Nmedians { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

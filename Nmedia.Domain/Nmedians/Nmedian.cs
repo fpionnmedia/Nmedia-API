@@ -1,11 +1,14 @@
 ﻿#nullable enable
+using Nmedia.Domain.Articles;
 using System;
+using System.Collections.Generic;
 
 namespace Nmedia.Domain.Nmedians
 {
   public class Nmedian
   {
     public short? Age { get; set; }
+    public ICollection<Article>? Articles { get; set; } = new List<Article>();
     public DateTimeOffset Created { get; set; }
     public DateTime? Hired { get; set; }
     public decimal? HourlyRate { get; set; }
