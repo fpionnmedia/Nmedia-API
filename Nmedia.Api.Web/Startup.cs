@@ -54,6 +54,7 @@ namespace Nmedia.Api.Web
         options.Filters.Add(new DbUpdateExceptionFilterAttribute());
       });
       services.AddCors();
+      services.AddGraphQL();
       services.AddHttpContextAccessor();
       services.AddInfrastructure();
       services.AddNpgsql();
@@ -85,21 +86,25 @@ namespace Nmedia.Api.Web
       application.UseCors(policy => policy.Configure(_corsConfiguration));
       application.UseWhen(RequiresAuth, application => application.UseMiddleware<Authentication>());
       application.UseAuthorization();
-      application.UseEndpoints(endpoints => endpoints.MapControllers());
+      application.UseEndpoints(endpoints =>
+      {
+        endpoints.MapGraphQL();
+        endpoints.MapControllers();
+      });
+      application.UseGraphQLVoyager();
     }
 
     private bool RequiresAuth(HttpContext context)
     {
-      PathString path = context.Request.Path;
+      //PathString path = context.Request.Path;
 
-      if (path.HasValue)
-      {
-        string trimmed = path.Value!.Trim('/');
-        return !string.IsNullOrEmpty(trimmed) && !_publicRoutes.Contains(trimmed);
-      }
+      //if (path.HasValue)
+      //{
+      //  string trimmed = path.Value!.Trim('/');
+      //  return !string.IsNullOrEmpty(trimmed) && !_publicRoutes.Contains(trimmed);
+      //} // TODO: implement
 
       return false;
     }
-
   }
 }

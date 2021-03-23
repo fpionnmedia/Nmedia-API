@@ -1,8 +1,13 @@
 ﻿#nullable enable
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Nmedia.Api.Persistence.Npgsql;
 using Nmedia.Api.Web.Configuration;
+using Nmedia.Api.Web.Graph;
+using Nmedia.Api.Web.Graph.Types;
 using System;
 using System.Collections.Generic;
 
@@ -11,6 +16,23 @@ namespace Nmedia.Api.Web
   public static class DependencyInjection
   {
     private const string BearerAuthId = "Bearer Authorization";
+
+    public static IServiceCollection AddGraphQL(this IServiceCollection services)
+    {
+      services.AddGraphQLServer()
+        .AddQueryType<Query>()
+        .AddType<ArticleType>()
+        .AddType<NmedianType>()
+        .AddFiltering()
+        .AddSorting(); // TODO: implement
+
+      return services
+        .AddPooledDbContextFactory<NmediaContext>((provider, options) =>
+        {
+          var configuration = provider.GetRequiredService<IConfiguration>();
+          options.UseNpgsql(configuration.GetConnectionString(nameof(NmediaContext)));
+        });
+    }
 
     public static IServiceCollection AddSwagger(this IServiceCollection services, ApiConfiguration apiConfiguration)
     {
