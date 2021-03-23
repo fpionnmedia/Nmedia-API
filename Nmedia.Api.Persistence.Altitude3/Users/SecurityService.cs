@@ -71,6 +71,18 @@ namespace Nmedia.Api.Persistence.Altitude3.Users
       };
     }
 
+    public async Task LogOutAsync(string refreshToken, CancellationToken cancellationToken)
+    {
+      var token = Guid.Parse(refreshToken);
+
+      var requestUri = new Uri("/log-out", UriKind.Relative);
+      using var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+      request.Headers.Add("Authorization", $"Bearer {token}");
+
+      using HttpResponseMessage response = await _client.SendAsync(request, cancellationToken);
+      response.EnsureSuccessStatusCode();
+    }
+
     private static Role GetRole(string userTypeName)
     {
       UserType userType = Enum.Parse<UserType>(userTypeName);
