@@ -81,6 +81,7 @@ namespace Nmedia.Api.Web
         ));
       }
 
+      application.UseWebSockets();
       application.UseHttpsRedirection();
       application.UseRouting();
       application.UseCors(policy => policy.Configure(_corsConfiguration));

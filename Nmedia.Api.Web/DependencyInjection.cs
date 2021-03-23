@@ -21,10 +21,13 @@ namespace Nmedia.Api.Web
     {
       services.AddGraphQLServer()
         .AddQueryType<Query>()
+        .AddMutationType<Mutation>()
+        .AddSubscriptionType<Subscription>()
         .AddType<ArticleType>()
         .AddType<NmedianType>()
         .AddFiltering()
-        .AddSorting(); // TODO: implement
+        .AddSorting()
+        .AddInMemorySubscriptions();
 
       return services
         .AddPooledDbContextFactory<NmediaContext>((provider, options) =>
