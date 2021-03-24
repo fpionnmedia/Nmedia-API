@@ -8,7 +8,7 @@ namespace Nmedia.Api.Web.Graph
   {
     [Subscribe]
     [Topic]
-    public Article OnArticleAdded([EventMessage] Article entity)
+    public Article OnArticleSaved([EventMessage] Article entity)
     {
       return entity;
     }

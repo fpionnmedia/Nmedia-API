@@ -7,7 +7,7 @@ namespace Nmedia.Api.Web.Graph.Inputs
   /// <summary>
   /// TODO: validation
   /// </summary>
-  public record AddArticleInput(
+  public record CreateArticleInput(
     Category[]? Categories,
     string? Content,
     Guid? NmedianId,

@@ -7,7 +7,7 @@ namespace Nmedia.Api.Web.Graph.Inputs
   /// <summary>
   /// TODO: validation
   /// </summary>
-  public record AddNmedianInput(
+  public record CreateNmedianInput(
     short? Age,
     DateTime? Hired,
     decimal? HourlyRate,

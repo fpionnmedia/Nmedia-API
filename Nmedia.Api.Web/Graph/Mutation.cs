@@ -18,8 +18,8 @@ namespace Nmedia.Api.Web.Graph
   public class Mutation
   {
     [UseDbContext(typeof(NmediaContext))]
-    public async Task<AddArticlePayload> AddArticleAsync(
-      AddArticleInput input,
+    public async Task<CreateArticlePayload> CreateArticleAsync(
+      CreateArticleInput input,
       [Service] IDateTimeOffset dateTimeOffset,
       [Service] IGuid guid,
       [Service] ITopicEventSender sender,
@@ -52,14 +52,69 @@ namespace Nmedia.Api.Web.Graph
       dbContext.Articles.Add(entity);
       await dbContext.SaveChangesAsync(cancellationToken);
 
-      await sender.SendAsync(nameof(Subscription.OnArticleAdded), entity, cancellationToken);
+      await sender.SendAsync(nameof(Subscription.OnArticleSaved), entity, cancellationToken);
 
-      return new AddArticlePayload(entity);
+      return new CreateArticlePayload(entity);
     }
 
     [UseDbContext(typeof(NmediaContext))]
-    public async Task<AddNmedianPayload> AddNmedianAsync(
-      AddNmedianInput input,
+    public async Task<DeleteArticlePayload> DeleteArticleAsync(
+      DeleteArticleInput input,
+      [ScopedService] NmediaContext dbContext,
+      CancellationToken cancellationToken
+    )
+    {
+      Article entity = await dbContext.Articles
+        .SingleOrDefaultAsync(x => x.Uuid == input.Id, cancellationToken)
+        ?? throw new ArgumentException($"The Article (ID={input.Id}) could not be found.", nameof(input));
+
+      dbContext.Articles.Remove(entity);
+      await dbContext.SaveChangesAsync(cancellationToken);
+
+      return new DeleteArticlePayload(entity);
+    }
+
+      [UseDbContext(typeof(NmediaContext))]
+    public async Task<UpdateArticlePayload> UpdateArticleAsync(
+      UpdateArticleInput input,
+      [Service] IDateTimeOffset dateTimeOffset,
+      [Service] ITopicEventSender sender,
+      [ScopedService] NmediaContext dbContext,
+      CancellationToken cancellationToken
+    )
+    {
+      Nmedian? nmedian = null;
+      if (input.NmedianId.HasValue)
+      {
+        nmedian = await dbContext.Nmedians.SingleOrDefaultAsync(
+          x => x.Uuid == input.NmedianId.Value,
+          cancellationToken
+        ) ?? throw new ArgumentException($"The Nmédian (ID={input.NmedianId}) could not be found.", nameof(input));
+      }
+
+      Article entity = await dbContext.Articles
+        .SingleOrDefaultAsync(x => x.Uuid == input.Id, cancellationToken)
+        ?? throw new ArgumentException($"The Article (ID={input.Id}) could not be found.", nameof(input));
+
+      entity.Categories = input.Categories;
+      entity.Content = input.Content;
+      entity.Nmedian = nmedian;
+      entity.NmedianId = nmedian?.Id;
+      entity.Picture = input.Picture;
+      entity.Published = input.Published;
+      entity.Title = input.Title;
+      entity.Updated = dateTimeOffset.Now;
+
+      await dbContext.SaveChangesAsync(cancellationToken);
+
+      await sender.SendAsync(nameof(Subscription.OnArticleSaved), entity, cancellationToken);
+
+      return new UpdateArticlePayload(entity);
+    }
+
+    [UseDbContext(typeof(NmediaContext))]
+    public async Task<CreateNmedianPayload> CreateNmedianAsync(
+      CreateNmedianInput input,
       [Service] IDateTimeOffset dateTimeOffset,
       [Service] IGuid guid,
       [ScopedService] NmediaContext dbContext,
@@ -83,7 +138,7 @@ namespace Nmedia.Api.Web.Graph
       dbContext.Nmedians.Add(entity);
       await dbContext.SaveChangesAsync(cancellationToken);
 
-      return new AddNmedianPayload(entity);
+      return new CreateNmedianPayload(entity);
     }
   }
 }
